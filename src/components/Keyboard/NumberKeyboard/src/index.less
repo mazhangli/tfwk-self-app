@@ -1,0 +1,144 @@
+.mat-number-keyboard {
+  position: relative;
+  bottom: 0;
+  left: 0;
+  z-index: 100;
+  width: 100%;
+  padding-bottom: 22px;
+  background: #f2f3f5;
+  user-select: none;
+  border-radius: 8px;
+
+  &--with-title {
+    border-radius: 20px 20px 0 0;
+  }
+
+  &__header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: content-box;
+    height: 34px;
+    padding-top: 0.12rem;
+    color: #646566;
+    font-size: 16px;
+  }
+
+  &__title {
+    display: inline-block;
+    font-weight: normal;
+
+    &-left {
+      position: absolute;
+      left: 0;
+    }
+  }
+
+  &__body {
+    display: flex;
+    padding: 0.12rem 0 0 0.12rem;
+  }
+
+  &__keys {
+    display: flex;
+    flex: 3;
+    flex-wrap: wrap;
+  }
+
+  &__close {
+    position: absolute;
+    right: 0;
+    height: 100%;
+    padding: 0 16px;
+    color: #576b95;
+    font-size: 14px;
+    background-color: transparent;
+    border: none;
+  }
+
+  &__sidebar {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+  }
+
+  &--unfit {
+    padding-bottom: 0;
+  }
+}
+
+.mat-key {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  //   height: 48px;
+  font-size: 0.4rem;
+  line-height: 2.5;
+  background: #fff;
+  border-radius: 8px;
+  height: 100%;
+  cursor: pointer;
+
+  &--large {
+    // height: 100% can't fill flex parent on legacy safari
+    // see: https://stackoverflow.com/questions/33636796
+    position: absolute;
+    top: 0;
+    right: 0.12rem;
+    bottom: 0.12rem;
+    left: 0;
+    height: auto;
+  }
+
+  &--blue,
+  &--delete {
+    font-size: 0.35rem;
+  }
+
+  &--active {
+    background-color: #ebedf0;
+  }
+
+  &--blue {
+    color: #fff;
+    background: #1989fa;
+
+    &.mat-key--active {
+      opacity: 0.6;
+    }
+  }
+
+  &__wrapper {
+    position: relative;
+    flex: 1;
+    flex-basis: 33%;
+    box-sizing: border-box;
+    padding: 0 0.12rem 0.12rem 0;
+
+    &--wider {
+      flex-basis: 66%;
+    }
+  }
+
+  &__delete-icon {
+    padding-right: 16px;
+    width: 0.5rem;
+    height: 100%;
+    line-height: 100%;
+  }
+
+  &__collapse-icon {
+    width: 0.5rem;
+    height: 100%;
+    line-height: 100%;
+  }
+
+  &__loading-icon {
+    color: #fff;
+  }
+}
+.mat-key:active {
+  background-color: #ebedf0;
+  opacity: 0.6;
+}

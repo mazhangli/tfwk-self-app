@@ -1,0 +1,145 @@
+//全局引入按需引入UI库vant
+import {
+  Col,
+  Row,
+  ActionBar,
+  ActionBarIcon,
+  ActionBarButton,
+  Divider,
+  Popup,
+  Overlay,
+  Loading,
+  Dialog,
+  ContactCard,
+  Form,
+  AddressEdit,
+  AddressList,
+  Field,
+  CellGroup,
+  Cell,
+  SwipeCell,
+  Icon,
+  Image as VantImage,
+  Stepper,
+  Card,
+  Checkbox,
+  CheckboxGroup,
+  Button as VantButton,
+  Swipe,
+  SwipeItem,
+  PullRefresh,
+  List,
+  Tab,
+  Tabs,
+  SubmitBar,
+  Toast,
+  NumberKeyboard,
+  Circle,
+  CountDown,
+  Step,
+  Steps,
+  Empty,
+  Tabbar,
+  TabbarItem,
+  Pagination,
+  NoticeBar,
+  IndexBar,
+  IndexAnchor,
+  Calendar,
+  Picker,
+  Sidebar,
+  SidebarItem,
+  Grid,
+  GridItem,
+  Popover,
+  DropdownMenu,
+  DropdownItem,
+  Switch,
+  RadioGroup,
+  Radio,
+  Badge,
+  ActionSheet,
+  Area,
+  Collapse,
+  CollapseItem,
+  TreeSelect,
+  Lazyload,
+  Tag,
+  Skeleton,
+} from 'vant';
+//全局引入样式
+import 'vant/lib/index.css'; /**VUE */
+//import "/@modules/vant/lib/index.css"; /**VITE */
+import '@vant/touch-emulator';
+function vantUI(appVue: any) {
+  appVue
+    .use(Col)
+    .use(Row)
+    .use(ActionBarButton)
+    .use(ActionBarIcon)
+    .use(ActionBar)
+    .use(Divider)
+    .use(Popup)
+    .use(Overlay)
+    .use(Loading)
+    .use(Dialog)
+    .use(Toast)
+    .use(ContactCard)
+    .use(Form)
+    .use(AddressEdit)
+    .use(AddressList)
+    .use(Field)
+    .use(CellGroup)
+    .use(Cell)
+    .use(SwipeCell)
+    .use(Icon)
+    .use(VantImage)
+    .use(Stepper)
+    .use(Card)
+    .use(VantButton)
+    .use(Swipe)
+    .use(SwipeItem)
+    .use(PullRefresh)
+    .use(List)
+    .use(Tab)
+    .use(Tabs)
+    .use(SubmitBar)
+    .use(Checkbox)
+    .use(NumberKeyboard)
+    .use(CheckboxGroup)
+    .use(Circle)
+    .use(CountDown)
+    .use(Step)
+    .use(Steps)
+    .use(Empty)
+    .use(Tabbar)
+    .use(TabbarItem)
+    .use(Pagination)
+    .use(NoticeBar)
+    .use(IndexBar)
+    .use(IndexAnchor)
+    .use(Calendar)
+    .use(Picker)
+    .use(Sidebar)
+    .use(SidebarItem)
+    .use(Grid)
+    .use(GridItem)
+    .use(Popover)
+    .use(DropdownMenu)
+    .use(DropdownItem)
+    .use(Switch)
+    .use(RadioGroup)
+    .use(Radio)
+    .use(Badge)
+    .use(ActionSheet)
+    .use(Area)
+    .use(Collapse)
+    .use(CollapseItem)
+    .use(TreeSelect)
+    .use(Skeleton)
+    .use(Lazyload, {
+      lazyComponent: true,
+    })
+    .use(Tag); //注册组件
+}
+export default vantUI;

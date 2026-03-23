@@ -1,0 +1,163 @@
+{
+  "id": "3017912",
+  "name": "自助机",
+  "font_family": "iconfont",
+  "css_prefix_text": "mat-icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "21244551",
+      "name": "建档确认",
+      "font_class": "jiandangqueren1",
+      "unicode": "e6dc",
+      "unicode_decimal": 59100
+    },
+    {
+      "icon_id": "6282765",
+      "name": "人脸识别",
+      "font_class": "renlianshibie",
+      "unicode": "e6b6",
+      "unicode_decimal": 59062
+    },
+    {
+      "icon_id": "554331",
+      "name": "键盘向下",
+      "font_class": "keyboardopen",
+      "unicode": "e6b5",
+      "unicode_decimal": 59061
+    },
+    {
+      "icon_id": "3734442",
+      "name": "46键盘",
+      "font_class": "keyboardblod",
+      "unicode": "e633",
+      "unicode_decimal": 58931
+    },
+    {
+      "icon_id": "11357450",
+      "name": "身份证正面",
+      "font_class": "idcard",
+      "unicode": "e601",
+      "unicode_decimal": 58881
+    },
+    {
+      "icon_id": "14778383",
+      "name": "身份证正面",
+      "font_class": "idcard-red",
+      "unicode": "e602",
+      "unicode_decimal": 58882
+    },
+    {
+      "icon_id": "21877897",
+      "name": "身份证",
+      "font_class": "idcard-color",
+      "unicode": "e604",
+      "unicode_decimal": 58884
+    },
+    {
+      "icon_id": "24937565",
+      "name": "首诊档案",
+      "font_class": "account",
+      "unicode": "e625",
+      "unicode_decimal": 58917
+    },
+    {
+      "icon_id": "25239397",
+      "name": "医保电子凭证",
+      "font_class": "medicare-qr",
+      "unicode": "e634",
+      "unicode_decimal": 58932
+    },
+    {
+      "icon_id": "25298893",
+      "name": "身份证正面",
+      "font_class": "idcard-camera",
+      "unicode": "e606",
+      "unicode_decimal": 58886
+    },
+    {
+      "icon_id": "25778604",
+      "name": "医保电子凭证",
+      "font_class": "medicareqr",
+      "unicode": "e64a",
+      "unicode_decimal": 58954
+    },
+    {
+      "icon_id": "26346585",
+      "name": "我的-医保卡",
+      "font_class": "wode-yibaoka",
+      "unicode": "e61a",
+      "unicode_decimal": 58906
+    },
+    {
+      "icon_id": "27630588",
+      "name": "说明",
+      "font_class": "shuoming",
+      "unicode": "e60a",
+      "unicode_decimal": 58890
+    },
+    {
+      "icon_id": "27997098",
+      "name": "医保卡",
+      "font_class": "medicarecard",
+      "unicode": "e6d4",
+      "unicode_decimal": 59092
+    },
+    {
+      "icon_id": "1462924",
+      "name": "user",
+      "font_class": "user",
+      "unicode": "e643",
+      "unicode_decimal": 58947
+    },
+    {
+      "icon_id": "5119651",
+      "name": "自助服务",
+      "font_class": "zizhufuwu",
+      "unicode": "e64e",
+      "unicode_decimal": 58958
+    },
+    {
+      "icon_id": "5564871",
+      "name": "z_outpatientMRP_normal",
+      "font_class": "printer",
+      "unicode": "e82d",
+      "unicode_decimal": 59437
+    },
+    {
+      "icon_id": "11033414",
+      "name": "自助购药",
+      "font_class": "medicine",
+      "unicode": "e603",
+      "unicode_decimal": 58883
+    },
+    {
+      "icon_id": "11039558",
+      "name": "自助购药",
+      "font_class": "medicine-dark",
+      "unicode": "e605",
+      "unicode_decimal": 58885
+    },
+    {
+      "icon_id": "26524359",
+      "name": "电子病历",
+      "font_class": "mr",
+      "unicode": "e600",
+      "unicode_decimal": 58880
+    },
+    {
+      "icon_id": "985258",
+      "name": "医疗",
+      "font_class": "medical",
+      "unicode": "e65e",
+      "unicode_decimal": 58974
+    },
+    {
+      "icon_id": "15556044",
+      "name": "自助机图标",
+      "font_class": "medicine-out",
+      "unicode": "e63e",
+      "unicode_decimal": 58942
+    }
+  ]
+}
