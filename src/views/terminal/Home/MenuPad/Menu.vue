@@ -1,532 +1,565 @@
 <template>
+  <!-- 主菜单 / 查询菜单（无子菜单） -->
   <div
-    :class="menu.type === 'main' ? ['appmenu__main', 'flex-c-s'] : ['appmenu__query', 'flex-c-s']"
-    ref="appmenu"
+    v-if="menu.type !== 'main' || menu.children.length === 0"
+    ref="cardRef"
+    class="menu-card"
+    :class="[orientation, { disabled: menu.disabled === 'true' }]"
+    :style="cardStyle"
+    @click="onClick()"
   >
-    <!-- 主要的menu -->
-    <div v-if="menu.type === 'main' && menu.children.length === 0" class="appmenu__main flex-c-s">
-      <van-button
-        v-preventReClick="2000"
-        plain
-        type="default"
-        class="content menubotton"
-        :style="[setClass]"
-        @click="login()"
-        :disabled="menu.disabled === 'true'"
-      >
-        <template #default>
-          <div class="content">
-            <div class="image">
-              <van-image :src="img" width="50%" />
-            </div>
-            <div class="text flex-c-c">
-              <p class="font-l blod chinese">{{ menu.menuname }}</p>
-              <p class="font-m english">{{ menu.english }}</p>
-            </div>
-            <p v-if="menu.disabled === 'true'" class="font-m blod disable">暂不启用</p>
-          </div>
-        </template>
-      </van-button>
+    <!-- 图标区：固定占卡片高度 35%，object-fit contain 保证完整显示 -->
+    <div class="menu-card__icon">
+      <img :src="img" alt="" />
     </div>
-    <!-- query类别的menu -->
-    <div v-if="menu.type === 'query'" class="appmenu__query">
-      <van-button
-        v-preventReClick="2000"
-        plain
-        type="default"
-        class="content menubotton"
-        :style="[setClass]"
-        @click="login()"
-        :disabled="menu.disabled === 'true'"
-      >
-        <template #default>
-          <div class="content flex-r-s nav">
-            <van-image :src="img" :style="[comsize]" />
-            <div :style="{ width: 'calc(100% - 0.8rem)' }">
-              <p class="font-l blod chinese">{{ menu.menuname }}</p>
-              <p class="font-m blod chinese">{{ menu.english }}</p>
-            </div>
-            <p v-if="menu.disabled === 'true'" class="font-m blod disable">暂不启用</p>
-          </div>
-        </template>
-      </van-button>
+    <!-- 文字区 -->
+    <div class="menu-card__text">
+      <p class="menu-card__cn">{{ menu.menuname }}</p>
+      <p class="menu-card__en">{{ menu.english }}</p>
     </div>
-    <!-- 含有子内容的menu -->
-    <div
-      v-if="menu.type === 'main' && menu.children.length > 0"
-      class="appmenu__main appmenu__pack flex-c-s"
-    >
-      <div class="content menubotton menubotton__tran">
-        <div class="appmenu flex-c-c">
-          <div class="head flex-r">
-            <van-image :src="img" width="20%" height="100%" />
-            <div :style="{ width: '80%' }">
-              <p class="font-l bloder chinese flex-r title">{{ menu.menuname }}</p>
-            </div>
-          </div>
-          <div class="flex-c-c info">
-            <div class="info__item">
-              <van-button
-                v-preventReClick="2000"
-                plain
-                type="default"
-                class="content menubotton"
-                :style="[setChildClass(0)]"
-                @click="login(0)"
-                :disabled="menu.children[0].disabled === 'true'"
-              >
-                <template #default>
-                  <div class="content flex-r-s nav">
-                    <van-image :src="menu.children[0].img" :style="[comsize]" class="sonimg" />
-                    <p class="font-l blod chinese">{{ menu.children[0].menuname }}</p>
-                    <p v-if="menu.children[0].disabled === 'true'" class="font-m blod disable">
-                      暂不启用
-                    </p>
-                  </div>
-                </template>
-              </van-button>
-            </div>
-            <div class="info__item">
-              <van-button
-                v-preventReClick="2000"
-                plain
-                type="default"
-                class="content menubotton"
-                :style="[setChildClass(1)]"
-                @click="login(1)"
-                :disabled="menu.children[1].disabled === 'true'"
-              >
-                <template #default>
-                  <div class="content flex-r-s nav">
-                    <van-image :src="menu.children[1].img" :style="[comsize]" class="sonimg" />
-                    <p class="font-l blod chinese">{{ menu.children[1].menuname }}</p>
-                    <p v-if="menu.children[1].disabled === 'true'" class="font-m blod disable">
-                      暂不启用
-                    </p>
-                  </div>
-                </template>
-              </van-button>
-            </div>
-          </div>
-        </div>
+    <div v-if="menu.disabled === 'true'" class="menu-card__mask"><span>暂不启用</span></div>
+  </div>
+
+  <!-- 含子菜单 -->
+  <div
+    v-else
+    class="menu-card menu-card--pack"
+    :style="cardStyle"
+  >
+    <div class="menu-card__head">
+      <img :src="img" alt="" class="menu-card__head-icon" />
+      <p class="menu-card__head-title">{{ menu.menuname }}</p>
+    </div>
+    <div class="menu-card__children">
+      <div
+        v-for="(child, i) in menu.children.slice(0, 2)"
+        :key="i"
+        class="menu-card__child"
+        :class="{ disabled: child.disabled === 'true' }"
+        :style="childStyle(i)"
+        @click="onClick(i)"
+      >
+        <img :src="childImg(i)" alt="" class="menu-card__child-icon" />
+        <p class="menu-card__child-name">{{ child.menuname }}</p>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-  import { appRouteEnum, pushRouteWithoutParam, pushRouteWithParam } from '@/router/router';
-  import { menus, menuSuspends } from '@/trans';
-  import { getStore, setStore } from '@/utils/cache/storage';
-  import { hexToRGBo } from '@/utils/color';
-  import { Toast } from 'vant';
-  import { useRect } from '@vant/use';
-  import { computed, defineComponent, onBeforeMount, onMounted, reactive, ref, toRefs } from 'vue';
-  import { Close, Open } from '@/utils/loading';
-  import { scheduling$branch$cathe$set, scheduling$cathe$set } from '@/trans/server/his/register';
-  export default defineComponent({
-    name: 'AppMenu',
-    props: {
-      menu: {} as any,
-    },
-    components: {},
-    setup(props, ctx) {
-      const state = reactive({
-        rect: null as any,
-        menuRefresh: null as any,
-        img: '',
-      });
-      const appmenu = ref();
-      const setClass = computed((): any => {
-        let less: string[] = [];
-        if (props.menu) {
-          const rgb = hexToRGBo(props.menu.menucolor);
-          const webket =
-            '-webkit-gradient(linear,left top, left bottom,from(rgba(' +
-            rgb +
-            ',0.5)),color-stop(30%, ' +
-            props.menu.menucolor +
-            '))';
-          const normal =
-            'linear-gradient(-180deg,rgba(' + rgb + ',0.5) 0%, ' + props.menu.menucolor + ' 30%)';
-          less = [
-            'background-image:' + webket,
-            'background-image:' + normal,
-            'box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-            'padding: 3%',
-          ];
-        } else {
-          less = ['display:none'];
-        }
-        return less;
-      });
-      const setChildClass = function (index: number) {
-        let less: string[] = [];
-        if (props.menu.children[index]) {
-          const rgb = hexToRGBo(props.menu.children[index].menucolor);
-          const webket =
-            '-webkit-gradient(linear,right, left,from(rgba(' +
-            rgb +
-            ',0.7)),color-stop(50%, ' +
-            props.menu.children[index].menucolor +
-            '))';
-          const normal =
-            'linear-gradient(to right,rgba(' +
-            rgb +
-            ',0.7) 0%, ' +
-            props.menu.children[index].menucolor +
-            ' 50%)';
-          less = [
-            'background-image:' + webket,
-            'background-image:' + normal,
-            'box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-            'padding: 3%',
-          ];
-        } else {
-          less = ['display:none'];
-        }
-        return less;
-      };
-      onMounted(() => {});
-      const comsize = computed(() => {
-        state.rect = useRect(appmenu);
-        var less = [];
-        if (state.rect.width >= state.rect.height) {
-          less = ['width: ' + (state.rect.height / 3) * 2 + 'px'];
-        } else {
-          less = ['width: ' + (state.rect.width / 3) * 2 + 'px'];
-        }
-        return less;
-      });
-      onBeforeMount(() => {
-        state.menuRefresh = props.menu;
-        state.img = require('@/assets/svg/button/' + props.menu.menuicon + '');
-        if (props.menu.children && props.menu.children.length > 0) {
-          props.menu.children[0].img = require('@/assets/svg/button/' +
-            props.menu.children[0].menuicon +
-            '');
-          props.menu.children[1].img = require('@/assets/svg/button/' +
-            props.menu.children[1].menuicon +
-            '');
-        }
-      });
+import { appRouteEnum, pushRouteWithoutParam, pushRouteWithParam } from '@/router/router';
+import { menuSuspends } from '@/trans';
+import { getStore, setStore } from '@/utils/cache/storage';
+import { Toast } from 'vant';
+import { computed, defineComponent, onMounted, onUnmounted, reactive, ref } from 'vue';
+import { Close, Open } from '@/utils/loading';
+import { scheduling$branch$cathe$set, scheduling$cathe$set } from '@/trans/server/his/register';
 
-      const login = async function (index?: number) {
-        if (props?.menu?.menucode?.includes('regist')) {
-          // 使用 setTimeout（宏任务）让代码在主栈清空后执行，完全不阻塞主业务
-          setTimeout(async () => {
-            try {
-              await scheduling$cathe$set().catch((err) =>
-                console.debug('scheduling$cathe$set执行失败:', err)
-              );
-              await scheduling$branch$cathe$set().catch((err) =>
-                console.debug('scheduling$branch$cathe$set执行失败:', err)
-              );
-              console.debug('菜单判断后执行缓存设置成功');
-            } catch (error) {
-              console.debug('菜单判断后执行缓存设置失败:', error);
-            }
-          }, 0);
-        }
+const resolveIcon = (ic: string): string => {
+  if (!ic) return '';
+  if (/^https?:\/\//.test(ic) || ic.startsWith('//') || ic.startsWith('/')) return ic;
+  try {
+    return require('@/assets/svg/button/' + ic);
+  } catch {
+    return ic;
+  }
+};
 
-         console.log('记录登录');
-        //跳转登录页面
-        if (index === 0 || index === 1) {
-          // if (props.menu.children[index].suspended === "true") {
-          if (props.menu.menucode === '') Open('正在查询当前是否超出使用时间，请稍后...');
-          var suspends = (await menuSuspends(props.menu.menucode?.toLowerCase())) as any;
-          Close();
-          //console.log(suspends);
-          if (suspends && suspends.suspended === 'true') {
-            Toast({
-              message: suspends.suspendedReason,
-              className: 'mat_vant__toast',
-            });
-            return;
-          }
-          state.menuRefresh = getStore('menu').filter((query: { menucode: string }) => {
-            if (query.menucode.toLowerCase() === props.menu.menucode?.toLowerCase()) {
-              return query;
-            }
-          })[0];
-          // }
-          // if (state.menuRefresh && state.menuRefresh.children[index].suspended === 'true') {
-          //   Toast({
-          //     message: state.menuRefresh.children[index].suspendedReason,
-          //     className: 'mat_vant__toast',
-          //   });
-          //   return;
-          // }
-          setStore('last', { menuCode: props.menu.children[index].menucode });
-          switch (props.menu.children[index].menucode) {
-            case 'charge.standards':
-              pushRouteWithoutParam(appRouteEnum.BasicItem);
-              break;
-            case 'staff.nuclein':
-            case 'nosocomial.nuclein':
-            case 'dlyy.examine':
-              pushRouteWithParam(appRouteEnum.userLoginMedia, {
-                menucode: props.menu.children[index].menucode?.toLowerCase(),
-              });
-              break;
-            case 'medical.record.print':
-              if (getStore('machine').hospitalcode.toLowerCase() === 'mhzyy') {
-                pushRouteWithParam(appRouteEnum.userLoginDirect, {
-                  menucode: props.menu.menucode?.toLowerCase(),
-                });
-              } else {
-                pushRouteWithParam(appRouteEnum.userLogin, {
-                  mediums: JSON.stringify(props.menu.mediums),
-                  menucode: props.menu.menucode?.toLowerCase(),
-                });
-              }
-              break;
-            case 'Report.bUltrasonics':
-              pushRouteWithParam(appRouteEnum.bUltrasonicsReport, {
-                mediums: JSON.stringify(props.menu.mediums),
-                menucode: props.menu.menucode?.toLowerCase(),
-              });
-              break;
-            case 'medical.proof.print':
-            case 'medical.prescription.print':
-            case 'lisreport':
-              console.log('民航登录');
-              pushRouteWithParam(appRouteEnum.userLoginDirect, {
-                menucode: props.menu.children[index].menucode?.toLowerCase(),
-              });
-              break;
-            default:
-              pushRouteWithParam(appRouteEnum.userLogin, {
-                mediums: JSON.stringify(props.menu.children[index].mediums),
-                menucode: props.menu.children[index].menucode?.toLowerCase(),
-              });
-              break;
-          }
-        } else {
-          //// if (props.menu.suspended === "true") {
-          Open('正在查询当前是否超出使用时间，请稍后...');
-          var suspends = (await menuSuspends(props.menu.menucode?.toLowerCase())) as any;
-          Close();
-          //console.log(suspends);
-          if (suspends && suspends.suspended === 'true') {
-            Toast({
-              message: suspends.suspendedReason,
-              className: 'mat_vant__toast',
-            });
-            return;
-          }
-          state.menuRefresh = getStore('menu').filter((query: { menucode: string }) => {
-            if (query.menucode.toLowerCase() === props.menu.menucode?.toLowerCase()) {
-              return query;
-            }
-          })[0];
-          // // }
-          // if (state.menuRefresh.suspended === 'true') {
-          //   Toast({
-          //     message: state.menuRefresh.suspendedReason,
-          //     className: 'mat_vant__toast',
-          //   });
-          //   return;
-          // }
-          if (props.menu.subfield && props.menu.subfield.length > 0) {
-            if (ctx) ctx.emit('subfield', props.menu.subfield);
-            return;
-          }
-          setStore('last', { menuCode: props.menu.menucode });
-          switch (props.menu.menucode) {
-            case 'account':
-              pushRouteWithoutParam(appRouteEnum.PatientCreate);
-              break;
-            case 'charge.standards':
-              pushRouteWithoutParam(appRouteEnum.BasicItem);
-              break;
-            case 'staff.nuclein':
-            case 'nosocomial.nuclein':
-              pushRouteWithParam(appRouteEnum.userLoginMedia, {
-                menucode: props.menu.menucode?.toLowerCase(),
-              });
-              break;
-            case 'dlyy.nucleic.appointment':
-            case 'dlyy.nucleic.today':
-            case 'dlyy.examine':
-              pushRouteWithParam(appRouteEnum.userLoginMedia, {
-                menucode: props.menu.menucode?.toLowerCase(),
-              });
-              break;
-            case 'examination':
-              pushRouteWithParam(appRouteEnum.Examination, {
-                menucode: props.menu.menucode?.toLowerCase(),
-              });
-              break;
-            case 'medical.record.print':
-              if (getStore('machine').hospitalcode.toLowerCase() === 'mhzyy') {
-                pushRouteWithParam(appRouteEnum.userLoginDirect, {
-                  menucode: props.menu.menucode?.toLowerCase(),
-                });
-              } else {
-                pushRouteWithParam(appRouteEnum.userLogin, {
-                  mediums: JSON.stringify(props.menu.mediums),
-                  menucode: props.menu.menucode?.toLowerCase(),
-                });
-              }
-              break;
-            case 'medical.proof.print':
-            case 'medical.prescription.print':
-            case 'medical.transfer.print':
-            case 'medical.invoice.print':
-            case 'registry.mhzyy':
-              pushRouteWithParam(appRouteEnum.userLoginDirect, {
-                menucode: props.menu.menucode?.toLowerCase(),
-              });
-              break;
-            case 'lisreport':
-              if (getStore('machine').hospitalcode.toLowerCase() === 'mhzyy') {
-                pushRouteWithParam(appRouteEnum.userLoginDirect, {
-                  menucode: props.menu.menucode?.toLowerCase(),
-                });
-              } else {
-                pushRouteWithParam(appRouteEnum.userLogin, {
-                  mediums: JSON.stringify(props.menu.mediums),
-                  menucode: props.menu.menucode?.toLowerCase(),
-                });
-              }
-              break;
-            case 'lisreport.new':
-              pushRouteWithParam(appRouteEnum.userLogin, {
-                mediums: JSON.stringify(props.menu.mediums),
-                menucode: props.menu.menucode?.toLowerCase(),
-              });
-              break;
-            case 'registry.dlyy':
-              pushRouteWithParam(appRouteEnum.RegistryDlyy, {
-                mediums: JSON.stringify(props.menu.mediums),
-                menucode: props.menu.menucode?.toLowerCase(),
-              });
-              break;
+export default defineComponent({
+  name: 'AppMenu',
+  props: {
+    menu: { type: Object as any, default: () => ({}) },
+  },
+  emits: ['subfield'],
+  setup(props, { emit }) {
+    const cardRef = ref<HTMLElement | null>(null);
+    const orientation = ref<'portrait' | 'landscape'>('portrait');
+    let ro: ResizeObserver | null = null;
 
-            default:
-              pushRouteWithParam(appRouteEnum.userLogin, {
-                mediums: JSON.stringify(props.menu.mediums),
-                menucode: props.menu.menucode?.toLowerCase(),
-              });
-              break;
-          }
-        }
-      };
+    const state = reactive({
+      img: '',
+      childImgs: [] as string[],
+    });
+
+    state.img = resolveIcon(props.menu?.menuicon);
+    if (props.menu?.children?.length) {
+      state.childImgs = props.menu.children.map((c: any) => resolveIcon(c?.menuicon));
+    }
+
+    const updateOrientation = () => {
+      const el = cardRef.value;
+      if (!el) return;
+      const { width, height } = el.getBoundingClientRect();
+      orientation.value = width > height ? 'landscape' : 'portrait';
+      const cn = Math.min(height * 0.25, width * 0.11);
+      const en = Math.min(height * 0.14, width * 0.065);
+      el.style.setProperty('--cn-fs', cn + 'px');
+      el.style.setProperty('--en-fs', en + 'px');
+    };
+
+    onMounted(() => {
+      updateOrientation();
+      ro = new ResizeObserver(updateOrientation);
+      if (cardRef.value) ro.observe(cardRef.value);
+    });
+
+    onUnmounted(() => {
+      if (ro) ro.disconnect();
+    });
+
+    const childImg = (i: number | string) => state.childImgs[i as number] || '';
+
+    const cardStyle = computed(() => {
+      const color = props.menu.menucolor || '#468AFD';
       return {
-        ...props,
-        ...toRefs(state),
-        setClass,
-        setChildClass,
-        login,
-        appmenu,
-        comsize,
+        backgroundColor: color,
+        backgroundImage:
+          'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.02) 45%, rgba(0,0,0,0.1) 100%)',
+        boxShadow:
+          '0 4px 12px rgba(0, 0, 0, 0.1), ' +
+          'inset 0 1px 1px rgba(255, 255, 255, 0.35), ' +
+          'inset 0 -1px 2px rgba(0, 0, 0, 0.15)',
       };
-    },
-  });
+    });
+
+    const childStyle = (i: number | string) => {
+      const child = props.menu.children?.[i];
+      if (!child) return {};
+      const color = child.menucolor || '#468AFD';
+      return {
+        backgroundColor: color,
+        backgroundImage: 'linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 50%, rgba(0,0,0,0.15) 100%)',
+        boxShadow:
+          '0 2px 6px rgba(0, 0, 0, 0.1), ' +
+          'inset 0 1px 1px rgba(255, 255, 255, 0.25)',
+      };
+    };
+
+    const onClick = async (index?: number | string) => {
+      if (props.menu.disabled === 'true') return;
+
+      if (props?.menu?.menucode?.includes('regist')) {
+        setTimeout(async () => {
+          try {
+            await scheduling$cathe$set().catch((err) => console.debug('scheduling$cathe$set失败:', err));
+            await scheduling$branch$cathe$set().catch((err) => console.debug('scheduling$branch$cathe$set失败:', err));
+          } catch (error) {
+            console.debug('缓存设置失败:', error);
+          }
+        }, 0);
+      }
+
+      // 子菜单点击
+      if (index === 0 || index === 1) {
+        Open('正在查询当前是否超出使用时间，请稍后...');
+        const suspends = (await menuSuspends(props.menu.menucode?.toLowerCase())) as any;
+        Close();
+        if (suspends && suspends.suspended === 'true') {
+          Toast({ message: suspends.suspendedReason, className: 'mat_vant__toast' });
+          return;
+        }
+        const child = props.menu.children[index];
+        setStore('last', { menuCode: child.menucode });
+        switch (child.menucode) {
+          case 'charge.standards':
+            pushRouteWithoutParam(appRouteEnum.BasicItem);
+            break;
+          case 'staff.nuclein':
+          case 'nosocomial.nuclein':
+          case 'dlyy.examine':
+            pushRouteWithParam(appRouteEnum.userLoginMedia, { menucode: child.menucode?.toLowerCase() });
+            break;
+          case 'medical.record.print':
+            if (getStore('machine').hospitalcode.toLowerCase() === 'mhzyy') {
+              pushRouteWithParam(appRouteEnum.userLoginDirect, { menucode: props.menu.menucode?.toLowerCase() });
+            } else {
+              pushRouteWithParam(appRouteEnum.userLogin, { mediums: JSON.stringify(props.menu.mediums), menucode: props.menu.menucode?.toLowerCase() });
+            }
+            break;
+          case 'Report.bUltrasonics':
+            pushRouteWithParam(appRouteEnum.bUltrasonicsReport, { mediums: JSON.stringify(props.menu.mediums), menucode: props.menu.menucode?.toLowerCase() });
+            break;
+          case 'medical.proof.print':
+          case 'medical.prescription.print':
+          case 'lisreport':
+            pushRouteWithParam(appRouteEnum.userLoginDirect, { menucode: child.menucode?.toLowerCase() });
+            break;
+          default:
+            pushRouteWithParam(appRouteEnum.userLogin, { mediums: JSON.stringify(child.mediums), menucode: child.menucode?.toLowerCase() });
+            break;
+        }
+        return;
+      }
+
+      // 主菜单点击
+      Open('正在查询当前是否超出使用时间，请稍后...');
+      const suspends = (await menuSuspends(props.menu.menucode?.toLowerCase())) as any;
+      Close();
+      if (suspends && suspends.suspended === 'true') {
+        Toast({ message: suspends.suspendedReason, className: 'mat_vant__toast' });
+        return;
+      }
+      if (props.menu.subfield && props.menu.subfield.length > 0) {
+        emit('subfield', props.menu.subfield);
+        return;
+      }
+      setStore('last', { menuCode: props.menu.menucode });
+      switch (props.menu.menucode) {
+        case 'account':
+          pushRouteWithoutParam(appRouteEnum.PatientCreate);
+          break;
+        case 'charge.standards':
+          pushRouteWithoutParam(appRouteEnum.BasicItem);
+          break;
+        case 'staff.nuclein':
+        case 'nosocomial.nuclein':
+          pushRouteWithParam(appRouteEnum.userLoginMedia, { menucode: props.menu.menucode?.toLowerCase() });
+          break;
+        case 'dlyy.nucleic.appointment':
+        case 'dlyy.nucleic.today':
+        case 'dlyy.examine':
+          pushRouteWithParam(appRouteEnum.userLoginMedia, { menucode: props.menu.menucode?.toLowerCase() });
+          break;
+        case 'examination':
+          pushRouteWithParam(appRouteEnum.Examination, { menucode: props.menu.menucode?.toLowerCase() });
+          break;
+        case 'medical.record.print':
+          if (getStore('machine').hospitalcode.toLowerCase() === 'mhzyy') {
+            pushRouteWithParam(appRouteEnum.userLoginDirect, { menucode: props.menu.menucode?.toLowerCase() });
+          } else {
+            pushRouteWithParam(appRouteEnum.userLogin, { mediums: JSON.stringify(props.menu.mediums), menucode: props.menu.menucode?.toLowerCase() });
+          }
+          break;
+        case 'medical.proof.print':
+        case 'medical.prescription.print':
+        case 'medical.transfer.print':
+        case 'medical.invoice.print':
+        case 'registry.mhzyy':
+          pushRouteWithParam(appRouteEnum.userLoginDirect, { menucode: props.menu.menucode?.toLowerCase() });
+          break;
+        case 'lisreport':
+          if (getStore('machine').hospitalcode.toLowerCase() === 'mhzyy') {
+            pushRouteWithParam(appRouteEnum.userLoginDirect, { menucode: props.menu.menucode?.toLowerCase() });
+          } else {
+            pushRouteWithParam(appRouteEnum.userLogin, { mediums: JSON.stringify(props.menu.mediums), menucode: props.menu.menucode?.toLowerCase() });
+          }
+          break;
+        case 'lisreport.new':
+          pushRouteWithParam(appRouteEnum.userLogin, { mediums: JSON.stringify(props.menu.mediums), menucode: props.menu.menucode?.toLowerCase() });
+          break;
+        case 'registry.dlyy':
+          pushRouteWithParam(appRouteEnum.RegistryDlyy, { mediums: JSON.stringify(props.menu.mediums), menucode: props.menu.menucode?.toLowerCase() });
+          break;
+        default:
+          pushRouteWithParam(appRouteEnum.userLogin, { mediums: JSON.stringify(props.menu.mediums), menucode: props.menu.menucode?.toLowerCase() });
+          break;
+      }
+    };
+
+    return { cardRef, orientation, cardStyle, childStyle, childImg, img: state.img, onClick };
+  },
+});
 </script>
 
 <style lang="less" scoped>
-  .appmenu {
+/* ============================================================
+   卡片容器
+   ============================================================ */
+.menu-card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 0.28rem;
+  overflow: hidden;
+  box-sizing: border-box;
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  padding: 4% 6%;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 50%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 100%);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  > * {
     position: relative;
-    // height: 4rem;
-    // width: 4.5rem;
-    // max-height: 4rem;
-    // max-width: 4.5rem;
+    z-index: 2;
+  }
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:active:not(.disabled) {
+    transform: scale(0.96);
+    box-shadow:
+      0 2px 6px rgba(0, 0, 0, 0.1),
+      inset 0 1px 1px rgba(255, 255, 255, 0.3),
+      inset 0 -1px 2px rgba(0, 0, 0, 0.1) !important;
+  }
+  &.disabled {
+    cursor: not-allowed;
+  }
+}
+
+/* ============================================================
+   横向（landscape）
+   ============================================================ */
+.menu-card.landscape {
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: 0;
+  padding: 0 5%;
+
+  .menu-card__text {
+    order: 1;
     width: 100%;
-    height: 100%;
-    max-width: 50vw;
-    max-height: 50vh;
-
-    &__main {
-      // height: 4rem;
-      // width: 4.5rem;
-      width: 100%;
-      height: 100%;
-      max-width: 50vw;
-      max-height: 50vh;
-    }
-
-    &__query {
-      // height: ~'calc(2rem - 0.05rem)';
-      // width: 4.5rem;
-      //padding: 10px;
-      width: 100%;
-      height: 100%;
-      max-width: 50vw;
-      max-height: 50vh;
-    }
-
-    //&__hasson {}
+    flex: 1 1 auto;
+    min-width: 0;
+    align-items: flex-start;
+    justify-content: center;
+    text-align: left;
+    padding-right: 24%;
+    box-sizing: border-box;
   }
 
-  .menubotton {
-    border-radius: 1em;
-
-    &__tran {
-      background: rgba(#333, 0.3) !important;
-    }
+  .menu-card__en {
+    margin-top: 0.1rem;
+    display: block;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
-  .sonimg {
-    transform: scale(0.65, 0.65);
-  }
-
-  .image {
-    height: 60%;
-    width: 100%;
+  .menu-card__icon {
+    position: absolute;
+    right: 4%;
+    bottom: 8%;
+    width: auto;
+    height: 64%;
+    aspect-ratio: 1 / 1;
+    flex: none;
+    z-index: 1;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+    opacity: 0.7;
+    pointer-events: none;
 
     img {
-      width: 40%;
+      width: 58%;
+      height: 58%;
+      max-width: 58%;
+      max-height: 58%;
+      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
     }
   }
+}
 
-  .text {
-    height: 40%;
-    width: 100%;
+/* ============================================================
+   图标区
+   ============================================================ */
+.menu-card__icon {
+  flex: 0 0 auto;
+  width: 100%;
+  height: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,0.15));
+  }
+}
+
+/* ============================================================
+   文字区
+   ============================================================ */
+.menu-card__text {
+  flex: 0 1 auto;
+  width: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+}
+
+/* ★ 中文主标题：加重字重，对齐 Creator.Fund 的 "blod font-l" 风格 */
+.menu-card__cn {
+  color: #fff;
+  font-size: var(--cn-fs, 0.4rem);
+  font-weight: 500;       /* 600 → 700 */
+  line-height: 1.25;
+  letter-spacing: 0.02em;
+  margin: 0;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.25);
+}
+
+/* ★ 英文副标题：同样加重，对齐 Creator.Fund 的 "blod font" 风格 */
+.menu-card__en {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: var(--en-fs, 0.24rem);
+  font-weight: 700;       /* 400 → 700 */
+  line-height: 1.3;
+  margin: 0.08rem 0 0;
+  max-width: 100%;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  word-break: break-word;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+/* ============================================================
+   禁用遮罩
+   ============================================================ */
+.menu-card__mask {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(2px);
+  z-index: 3;
+  span {
+    color: #fff;
+    font-size: 0.3rem;
+    padding: 0.12rem 0.36rem;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.4);
+    white-space: nowrap;
+  }
+}
+
+/* ============================================================
+   含子菜单卡片
+   ============================================================ */
+.menu-card--pack {
+  background: rgba(51, 51, 51, 0.3) !important;
+  cursor: default;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 0;
+  padding: 5% 6%;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15), 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.menu-card__head {
+  width: 100%;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 3%;
+  margin-bottom: 4%;
+}
+
+.menu-card__head-icon {
+  height: 0.6rem;
+  width: 0.6rem;
+  flex: 0 0 0.6rem;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 3px rgba(0,0,0,0.2));
+}
+
+/* ★ 含子菜单的标题：已是最重 700，保持不变 */
+.menu-card__head-title {
+  color: #fff;
+  font-size: 0.4rem;
+  font-weight: 600;
+  margin: 0;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.menu-card__children {
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  gap: 3%;
+  min-height: 0;
+}
+
+.menu-card__child {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  padding: 0 4%;
+  cursor: pointer;
+  overflow: hidden;
+  position: relative;
+  transition: transform 0.15s ease, filter 0.15s ease;
+
+  &:active:not(.disabled) {
+    transform: scale(0.97);
+    filter: brightness(0.95);
+  }
+  &.disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
   }
 
-  .chinese {
-    color: white;
-    vertical-align: middle;
-    width: 100%;
-    margin: 0.1rem;
-    line-height: 0.5rem;
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 50%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 100%);
+    pointer-events: none;
   }
+}
 
-  .english {
-    color: white;
-    vertical-align: middle;
-    width: 100%;
-    line-height: 0.3rem;
-  }
+.menu-card__child-icon {
+  width: 0.7rem;
+  height: 0.7rem;
+  object-fit: contain;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 1px 3px rgba(0,0,0,0.15));
+}
 
-  .disable {
-    color: black;
-  }
-
-  .nav {
-    padding: 5%;
-  }
-
-  .head {
-    width: 100%;
-    height: 15%;
-  }
-
-  .info {
-    width: 90%;
-    height: 80%;
-
-    &__item {
-      height: 50%;
-      width: 100%;
-      padding: 8px 8px 8px;
-    }
-  }
-
-  /deep/ .van-button--default {
-    border: none;
-    padding: 0;
-  }
+/* ★ 子项名称：已是最重 700，保持不变 */
+.menu-card__child-name {
+  color: #fff;
+  font-size: 0.32rem;
+  font-weight: 700;
+  margin-left: 3%;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.15);
+}
 </style>

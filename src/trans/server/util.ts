@@ -25,6 +25,7 @@ export default function callServer<T = any>(json: Object): Promise<T> {
     http('')
       .post(method, params)
       .then(async function (res: any) {
+        console.dir(res);
         if (res) {
           const state = await Analysis(res);
           if (state) {
@@ -48,14 +49,7 @@ export default function callServer<T = any>(json: Object): Promise<T> {
         }
       })
       .catch(function (e: Error) {
-        Toast.loading({
-          forbidClick: true,
-          message: e.message,
-          className: 'mat_vant__toast',
-          icon: require('@/assets/toast.mat.svg'),
-          duration: 3000,
-          overlay: true,
-        });
+        //业务错误提示已由 Analysis 中的 Toast.fail 展示，此处不再重复弹出"用户取消操作"等 message，避免覆盖真实提示
         Close();
         reject(e);
       });
@@ -108,7 +102,10 @@ function stateres(res: any, dialog = false) {
 export function Analysis<T = any>(res: any): Promise<T> {
   if (isDevMode()) console.log(JSON.stringify(res.data));
   return new Promise((resolve, reject) => {
-    if (!res.data) resolve(null as unknown as Promise<T>);
+    if (!res.data) {
+      resolve(null as unknown as Promise<T>);
+      return;
+    }
     const info = res.data;
     if (info.resultcode != '1' && info.method !="MenuSuspend") {
       Toast.fail({
@@ -120,6 +117,7 @@ export function Analysis<T = any>(res: any): Promise<T> {
         overlay: true,
       });
       Close();
+      resolve(null as unknown as Promise<T>);
     } else {
       if (info.dialog === true) {
         Close();

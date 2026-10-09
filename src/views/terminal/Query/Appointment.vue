@@ -39,8 +39,14 @@
         <van-empty v-if="empty === true" class="content__pack" :image="require('@/assets/svg/empty.3.svg')"
             image-size="4rem" description="没有查询到预约记录,或查询失败,可尝试[刷新]" />
         <div class="content__foot flex-r-3">
-            <div class="font-m text"
-                style="color:#1989fa; width: 30%;text-align: right; margin-right: 1rem;">仅显示有效且未就诊记录</div>
+            <div class="flex-r-c date-filter-bar">
+                <van-button class="date-filter-btn" type="primary" plain @click="showCalendar = true">
+                    <van-icon name="calendar-o" size="0.5rem" />
+                    <span>{{ dateRange[0] || '开始' }}</span>
+                    <span class="date-filter-sep">至</span>
+                    <span>{{ dateRange[1] || '结束' }}</span>
+                </van-button>
+            </div>
             <van-button v-preventReClick="2000" class="btn-size-normal font-s btn__foot margin" type="primary"
                 icon="replay" icon-position="left" @click="onRefresh">刷&nbsp;&nbsp;&nbsp;&nbsp;新
             </van-button>
@@ -48,8 +54,27 @@
                 icon="wap-home" icon-position="left" @click="onCancel">返回主页
             </van-button>
             <timer-button class="margin" ref="RefItimer" size="1.3rem" :total="300" :finish="onCancel" />
-            <!-- :finish="onCancel" -->
         </div>
+        <van-popup v-model:show="showCalendar" position="bottom" round class="cal-popup" :overlay-click-closeable="true">
+            <div class="cal-popup-header">
+                <span class="cal-popup-title">选择查询日期范围</span>
+                <van-icon name="cross" size="0.8rem" class="cal-popup-close" @click="showCalendar = false" />
+            </div>
+            <van-calendar
+                :poppable="false"
+                type="range"
+                :show-title="false"
+                :show-subtitle="false"
+                :show-confirm="true"
+                color="#1989fa"
+                :min-date="minDateObj"
+                :max-date="maxDateObj"
+                :default-date="defaultDateObj"
+                :confirm-text="'确定'"
+                row-height="1.2rem"
+                @confirm="onCalendarConfirm"
+            />
+        </van-popup>
     </div>
 </template>
     
@@ -64,28 +89,55 @@ import { encode } from 'js-base64';
 import { print } from '@/trans/driver/src/thermal';
 import { Dialog } from 'vant';
 import { getStore } from '@/utils/cache/storage';
+import moment from 'moment';
 export default defineComponent({
     name: 'QueryAppointment',
     props: {},
     emits: [],
     components: { TimerButton, PickerPack },
     setup(props, ctx) {
+        const showCalendar = ref(false);
         const state = reactive({
             patient: {} as any,
             info: {} as any,
             empty: false,
             appointment: null,
             data: null as any,
+            dateRange: [] as string[],
         });
+        const getDefaultDateRange = function () {
+            const end = moment().format('YYYY-MM-DD');
+            const start = moment().subtract(1, 'months').format('YYYY-MM-DD');
+            return [start, end];
+        };
+        const minDateObj = new Date(moment().subtract(1, 'years').startOf('day').toDate());
+        const maxDateObj = new Date(moment().endOf('day').toDate());
+        const getDefaultDateObj = function () {
+            const range = getDefaultDateRange();
+            return [new Date(range[0]), new Date(range[1])];
+        };
+        const defaultDateObj = ref(getDefaultDateObj());
+        const onCalendarConfirm = function (dates: Date[]) {
+            if (dates && dates.length === 2) {
+                state.dateRange = [
+                    moment(dates[0]).format('YYYY-MM-DD'),
+                    moment(dates[1]).format('YYYY-MM-DD'),
+                ];
+                showCalendar.value = false;
+                onRefresh();
+            }
+        };
         onMounted(async () => {
             state.patient = getStore('history');
             state.data = '123123';
             state.appointment = require('@/assets/svg/appointment.svg');
+            state.dateRange = getDefaultDateRange();
             await onRefresh();
         });
         const onRefresh = async function () {
             Open('');
-            state.info = await queryAppointment();
+            const range = state.dateRange && state.dateRange.length === 2 ? state.dateRange : getDefaultDateRange();
+            state.info = await queryAppointment(0, range[0], range[1]);
             console.log(state.info);
             if (!state.info || state.info.length === 0) {
                 state.empty = true;
@@ -101,12 +153,125 @@ export default defineComponent({
         const onPrint = async function (data: any) {
             await print({ context: encode(data.printContent) });
         };
-        return { ...toRefs(state), onCancel, onMounted, onRefresh, onPrint };
+        return { ...toRefs(state), showCalendar, minDateObj, maxDateObj, defaultDateObj, onCalendarConfirm, onCancel, onMounted, onRefresh, onPrint };
     },
 });
 </script>
     
 <style lang="less" scoped>
+.date-filter-bar {
+    flex-shrink: 0;
+    margin-right: 0.3rem;
+}
+
+.date-filter-btn {
+    height: 0.9rem;
+    font-size: 0.4rem;
+    padding: 0 0.4rem;
+    border-radius: 0.45rem;
+}
+
+/deep/ .date-filter-btn {
+    border-width: 2px !important;
+}
+
+.date-filter-btn .van-icon {
+    margin-right: 0.1rem;
+}
+
+.date-filter-sep {
+    margin: 0 0.15rem;
+    color: #1989fa;
+}
+
+/deep/ .cal-popup {
+    height: 80%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.cal-popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 1rem;
+    padding: 0 0.5rem;
+    border-bottom: 1px solid #ebedf0;
+    flex-shrink: 0;
+}
+
+.cal-popup-title {
+    font-size: 0.45rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.cal-popup-close {
+    color: #969799;
+    cursor: pointer;
+    padding: 0.2rem;
+}
+
+/deep/ .cal-popup .van-calendar {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: #fff;
+    overflow: hidden;
+}
+
+/deep/ .cal-popup .van-calendar__body {
+    flex: 1;
+    overflow-y: auto;
+}
+
+/deep/ .van-calendar__header {
+    padding: 0.3rem 0;
+    height: auto;
+    line-height: normal;
+    box-shadow: none;
+}
+
+/deep/ .van-calendar__weekday {
+    font-size: 0.38rem;
+    height: 0.7rem;
+    line-height: 0.7rem;
+}
+
+/deep/ .van-calendar__day {
+    flex-direction: column;
+    font-size: 0.42rem;
+}
+
+/deep/ .van-calendar__selected-day {
+    flex-direction: column;
+}
+
+/deep/ .van-calendar__top-info {
+    top: 0.08rem;
+    font-size: 0.36rem !important;
+    line-height: 1;
+    font-weight: bold;
+}
+
+/deep/ .van-calendar__bottom-info {
+    bottom: 0.08rem;
+    font-size: 0.36rem !important;
+    line-height: 1;
+    font-weight: bold;
+}
+
+/deep/ .van-calendar__month-title {
+    font-size: 0.48rem;
+    font-weight: bold;
+}
+
+/deep/ .van-calendar__confirm {
+    height: 1.2rem;
+    font-size: 0.55rem;
+}
+
 .card-header {
     display: flex;
     justify-content: space-between;

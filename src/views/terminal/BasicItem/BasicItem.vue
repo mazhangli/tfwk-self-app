@@ -43,7 +43,7 @@
                   <p :style="{ width: '50%' }" class="van-ellipsis">{{ item.excluded_content }}</p>
                 </span> -->
                 <span class="flex-r-c" :style="{ width: 'calc(100% - 0.8rem)', 'justify-content': 'flex-start' }"
-                  v-if="item.type === '诊疗'">
+                  v-if="item.type === '诊疗' || item.type === '耗材'">
                   <p :style="{ width: '10%' }" class="van-ellipsis">{{ item.itemCode }}</p>
                   <p :style="{ width: '35%' }" class="van-ellipsis">{{ item.itemName }}</p>
                   <p :style="{ width: '10%' }" class="van-ellipsis">¥ {{ item.itemPrice }}</p>
@@ -96,6 +96,7 @@
       const option = [
         { text: '药品', value: 0 },
         { text: '诊疗', value: 1 },
+        { text: '耗材', value: 2 },
       ];
       const Container = ref(null as any);
       onMounted(() => {});
@@ -169,6 +170,8 @@
 <style lang="less" scoped>
 .itemtype {
   width: 3rem;
+  /* Element Plus 通过该 CSS 变量控制组件整体高度 */
+  --el-component-size: 1.1rem;
 }
 
 .itemspell {
@@ -220,17 +223,24 @@
   width: 50%;
 }
 
-/deep/.el-input__inner {
-  font-size: 0.34rem;
-  height: 1rem;
+/* Vue 3 只支持 :deep()，旧的 /deep/ 规则会被整条丢弃 */
+:deep(.el-input__wrapper) {
+  height: 1.1rem;
+  font-size: 0.25rem;
 }
 
-/deep/.van-list__finished-text {
+:deep(.el-input__inner) {
+  font-size: 0.25rem;
+  height: 1.1rem;
+  line-height: 1.1rem;
+}
+
+:deep(.van-list__finished-text) {
   height: 1.5rem;
   font-size: 0.34rem;
 }
 
-/deep/.el-select-dropdown__item {
+:deep(.el-select-dropdown__item) {
   height: 1.2rem !important;
 }
 </style>

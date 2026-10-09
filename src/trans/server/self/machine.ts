@@ -53,18 +53,42 @@ export async function menuSuspend(menucode: string) {
         return false;
     }
 }
-export async function media() {
+export async function media(menuCode: string) {
     const systime = formatToDateTime(new Date().getTime());
     var empid = getStore('machine').machineid;
     const json = {
         method: "Media",
         finaltime: systime,
-        operator: empid
+        operator: empid,
+        info:{
+            menuCode: menuCode,
+        }     
     }
     var info = await callServer(json);
     if (info) {
         //setStore('media', info.medias);
         return info.medias;
+    } else {
+        return null;
+    }
+}
+
+export async function style() {
+    const systime = formatToDateTime(new Date().getTime());
+    var empid = getStore('machine').machineid;
+    var styleId = getStore('machine').styleId;
+    const json = {
+        method: "getStyleModel",
+        finaltime: systime,
+        operator: empid,
+        info:{
+            styleId: styleId,
+        }     
+    }
+    var info = await callServer(json);
+    console.log('style() 返回:', info);
+    if (info) {
+        return info;
     } else {
         return null;
     }

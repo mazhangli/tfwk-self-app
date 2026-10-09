@@ -1,12 +1,26 @@
 <template>
   <div class="content flex-c">
     <div class="content__pack flex-c-s" :style="{ padding: '1rem' }">
-      <span class="blod content__nav flex-c-c" style="font-size: 1.5rem; background-color: rgba(#3ee, 0.5)"
-        v-if="deviceName">
-        {{ deviceName }}</span>
-      <el-input id="inputfield" ref="inputfield" placeholder="请扫描条码或二维码 / 输入条码或二维码内容" :rows="1" prefix-icon="FullScreen"
-        :disabled="lockfield" v-model="inputfieldtext" :autofocus="true" :clearable="true" class="field"
-        @change="onChange">
+      <span
+        class="blod content__nav flex-c-c"
+        style="font-size: 1.5rem; background-color: rgba(#3ee, 0.5)"
+        v-if="deviceName"
+      >
+        {{ deviceName }}</span
+      >
+      <el-input
+        id="inputfield"
+        ref="inputfield"
+        placeholder="请扫描条码或二维码 / 输入条码或二维码内容"
+        :rows="1"
+        prefix-icon="FullScreen"
+        :disabled="lockfield"
+        v-model="inputfieldtext"
+        :autofocus="true"
+        :clearable="true"
+        class="field"
+        @change="onChange"
+      >
         <template #suffix>
           <i class="el-icon-edit el-input__icon" :style="{ 'font-size': '0.6rem' }"></i>
         </template>
@@ -16,13 +30,28 @@
         <van-image :src="icon" height="100%" fit="contain" />
       </div>
 
-      <van-empty v-if="printer()" :image="error" :description="printer()" image-size="4rem" class="bottom_icon" />
+      <van-empty
+        v-if="printer()"
+        :image="error"
+        :description="printer()"
+        image-size="4rem"
+        class="bottom_icon"
+      />
     </div>
-    <div v-if="menucode === 'registry.mhzyy' && deviceCode" class="content__nav font-l blod flex-r-2"
-      style="padding-left: 1rem">
-      签到机号:{{ deviceCode }}</div>
+    <div
+      v-if="menucode === 'registry.mhzyy' && deviceCode"
+      class="content__nav font-l blod flex-r-2"
+      style="padding-left: 1rem"
+    >
+      签到机号:{{ deviceCode }}</div
+    >
     <div class="content__foot flex-r-3" v-if="!redirect">
-      <van-button class="btn-size-small font-s" type="primary" icon="wap-home" v-on:click="onReturn()">返回首页
+      <van-button
+        class="btn-size-small font-s"
+        type="primary"
+        icon="wap-home"
+        v-on:click="onReturn()"
+        >返回首页
       </van-button>
       <timer-button ref="RefItimer" :total="60" :finish="onReturn" />
     </div>
@@ -87,8 +116,8 @@
 
       onMounted(async () => {
         state.redirect = getStore('machine').redirect;
-        if(getStore('machine').redirect === "appHome") {
-          state.redirect = "";
+        if (getStore('machine').redirect === 'appHome') {
+          state.redirect = '';
         }
         /*路由*/
         const route = useRoute();
@@ -120,7 +149,7 @@
           case 'medical.transfer.print':
             state.head = '请扫描就诊码、医保卡条形码或医保电子凭证，打印转诊单';
             break;
-            case 'medical.invoice.print':
+          case 'medical.invoice.print':
             state.head = '请扫描就诊码、医保卡条形码或医保电子凭证，打印发票';
             break;
           case 'lisreport':
@@ -154,18 +183,20 @@
         { target: document.body }
       );
       const onChange = async function () {
-        if (!state.inputfieldtext) return;
-        if(state.inputfieldtext.indexOf('wx.mhzyy.cn')>=0){
+        let inputText = state.inputfieldtext;
+        if (!inputText) return;
+        state.inputfieldtext = '';
+        if (inputText.indexOf('wx.mhzyy.cn') >= 0) {
           Toast.loading({
             forbidClick: true,
-            message: "当前为电子发票下载码，请您使用顶端条形码扫码签到。",
+            message: '当前为电子发票下载码，请您使用顶端条形码扫码签到。',
             className: 'mat_vant__toast',
             icon: require('@/assets/toast.mat.svg'),
             duration: 3000,
             overlay: true,
           });
           onReset();
-          speak("当前为电子发票下载码，请您使用凭条顶端条形码扫码签到。");
+          speak('当前为电子发票下载码，请您使用凭条顶端条形码扫码签到。');
           return;
         }
         state.lockfield = true;
@@ -176,8 +207,8 @@
           if (state.menucode != 'registry.mhzyy') {
             let sta = await callDriver(DeviceEnum.PRINTER, MethodEnum.STATE, {});
             if (!sta) {
-              await speak('打印机状态异常,请前往其他设备打印');
               onReset();
+              await speak('打印机状态异常,请前往其他设备打印');
               return;
             } else {
               setStore('reportPrinter', { state: 'ready', info: '正常状态' });
@@ -187,12 +218,12 @@
           ///民航签到机
           console.log(state.menucode);
           if (state.menucode === 'registry.mhzyy') {
-            await onReistry();
+            await onReistry(inputText);
             return;
           }
           await speak('正在查询...');
           /////身份证识别开始
-          await serverHistory('%', state.inputfieldtext, {});
+          await serverHistory('%', inputText, {});
           var info = getStore('history');
           if (isArray(info) && info.length === 0) info = null;
           console.log('info', info);
@@ -202,7 +233,7 @@
               return;
             }
             if (getStore('machine').hospitalcode === 'mhzyy') {
-              let insinfo = await callinsapi(MethodEnum.PERSON_WEB, state.inputfieldtext);
+              let insinfo = await callinsapi(MethodEnum.PERSON_WEB, inputText);
               if (insinfo) {
                 await serverHistory('%', insinfo.patientId, {});
                 info = getStore('history');
@@ -211,33 +242,33 @@
                   setStore('login', { cardtype: '医保卡' });
                   //continue;//capinfo电子凭证可识别
                 } else {
-                  speak('未识别出患者身份');
                   onReset();
+                  speak('未识别出患者身份');
                   return;
                 }
               } else {
-                speak('未识别出患者身份');
                 onReset();
+                speak('未识别出患者身份');
                 return;
               }
             } else {
-              var readed = await callinsapi(MethodEnum.READ, state.inputfieldtext);
+              var readed = await callinsapi(MethodEnum.READ, inputText);
               if (readed === true) {
                 var capinfo = getStore('capinfo');
-                await serverHistory('capinfo', state.inputfieldtext, capinfo);
+                await serverHistory('capinfo', inputText, capinfo);
                 info = getStore('history');
                 if (isArray(info) && info.length === 0) info = null;
                 if (info) {
                   setStore('login', { cardtype: '医保卡' });
                   //continue;//capinfo电子凭证可识别
                 } else {
-                  speak('未识别出患者身份');
                   onReset();
+                  speak('未识别出患者身份');
                   return;
                 }
               } else {
-                speak('未识别出患者身份');
                 onReset();
+                speak('未识别出患者身份');
                 return;
               }
             }
@@ -246,14 +277,15 @@
             //continue;//条码可识别
           }
           /////身份证识别结束
+          onReset();
           onPush();
         } catch (e) {
           console.log(e);
-          speak('未识别出患者身份');
           onReset();
+          speak('未识别出患者身份');
         }
       };
-      const onReistry = async function () {
+      const onReistry = async function (inputText: string) {
         ////民航签到机
         var d = await deviceArrivalMessage();
         if (d.workStatus === '0') {
@@ -270,15 +302,16 @@
           return;
         }
 
-        var of = await getArrivalList(state.inputfieldtext);
+        var of = await getArrivalList(inputText);
         Close();
         if (of) {
           pushRouteWithParam(appRouteEnum.Registry, {
             menucode: 'registry.mhzyy',
-            qrCode: state.inputfieldtext,
+            qrCode: inputText,
             data: JSON.stringify(of.append),
           });
         } else {
+          onReset();
           speak('签到失败');
           Toast.loading({
             forbidClick: true,
@@ -288,15 +321,16 @@
             duration: 5000,
             overlay: true,
           });
+          return;
         }
         onReset();
         return;
       };
-      const onReset = function () {        
+      const onReset = function () {
         state.inputfieldtext = '';
         state.lockfield = false;
-        if(!state.unmount){
-          if(inputfield) inputfield.value.focus();
+        if (!state.unmount) {
+          if (inputfield) inputfield.value.focus();
         }
         Close();
       };
@@ -362,42 +396,42 @@
 </script>
 
 <style lang="less" scoped>
-.field {
-  z-index: 2022;
-  box-shadow: 12px 12px 14px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
-  border-radius: 1em;
-}
+  .field {
+    z-index: 2022;
+    box-shadow: 12px 12px 14px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
+    border-radius: 1em;
+  }
 
-.tips {
-  color: coral;
-  font-size: 0.75rem;
-  font-weight: bolder;
-  line-height: 1rem;
-  height: 1rem;
-  vertical-align: middle;
-  width: 100%;
-}
+  .tips {
+    color: coral;
+    font-size: 0.75rem;
+    font-weight: bolder;
+    line-height: 1rem;
+    height: 1rem;
+    vertical-align: middle;
+    width: 100%;
+  }
 
-.bottom_icon {
-  bottom: 15vh;
-  right: 2vw;
-  position: fixed;
-}
+  .bottom_icon {
+    bottom: 15vh;
+    right: 2vw;
+    position: fixed;
+  }
 
-/deep/.el-input__icon {
-  width: 1rem;
-  vertical-align: middle;
-}
+  /deep/.el-input__icon {
+    width: 1rem;
+    vertical-align: middle;
+  }
 
-/deep/.el-input__inner {
-  height: 1rem;
-}
+  /deep/.el-input__inner {
+    height: 1rem;
+  }
 
-/deep/.el-input .el-input__clear {
-  font-size: 0.6rem;
-}
+  /deep/.el-input .el-input__clear {
+    font-size: 0.6rem;
+  }
 
-/dee/.el-icon-edit .el-input__icon {
-  font-size: 0.6rem;
-}
+  /dee/.el-icon-edit .el-input__icon {
+    font-size: 0.6rem;
+  }
 </style>

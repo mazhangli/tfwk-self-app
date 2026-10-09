@@ -74,7 +74,10 @@ export default defineComponent({
         console.log(menu[0]);
         //mediums = menu[0].mediums;
         mediums = JSON.stringify(menu[0].mediums);
-        state.value.img = require('@/assets/svg/button/' + menu[0].menuicon + '');
+        const icon = menu[0].menuicon || '';
+        state.value.img = /^https?:\/\//.test(icon) || icon.startsWith('//')
+          ? icon
+          : require('@/assets/svg/button/' + icon);
         state.value.bgcolor = menu[0].menucolor;
         state.value.chinese = menu[0].menuname;
         state.value.english = menu[0].english;

@@ -8,6 +8,7 @@
     "moduleResolution": "node",
     "experimentalDecorators": true,
     "allowJs": true,
+    "noEmit": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -31,11 +32,11 @@
   },
   "include": [
     "src/**/*.ts",
+    "src/**/*.js",
     "src/**/*.tsx",
     "src/**/*.vue",
     "tests/**/*.ts",
-    "tests/**/*.tsx",
-    "src/utils/terminal/callComputer.js"
+    "tests/**/*.tsx"
   ],
   "exclude": [
     "node_modules"

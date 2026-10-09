@@ -104,8 +104,9 @@ export default defineComponent({
                 Toast('非在院患者不支持每日一单查询');
             }
         };
-        const onDetail = function (item: any) {
-
+        const onDetail = async function (item: any) {
+            setStore('patient', item);
+            await pushRouteWithoutParam(appRouteEnum.Inventory);
         };
         return { ...toRefs(state), onHome, onRefresh, onOneDay, onDetail };
     },

@@ -38,9 +38,15 @@ export async function scheduling$cathe$set() {
     currentDate.setDate(currentDate.getDate() + i);
     const form = await scheduling$day(moment(currentDate).format('YYYY-MM-DD'));
     forms.push(...form);
+    try{
+      //超级长的情况会失败
+      setStore('scheduling', forms);
+    }catch(err){
+      console.log(err);
+      continue;
+    }
   }
-  setStore('scheduling', forms);
-  console.log(JSON.stringify(forms));
+  
   return true;
 }
 export async function scheduling$day(date: any) {

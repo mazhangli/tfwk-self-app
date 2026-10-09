@@ -35,6 +35,26 @@
   import { eject, inject as Inscard } from '@/trans/driver/src/inscard';
   import { inject as Patcard } from '@/trans/driver/src/patcard';
 
+  // ============================================================
+  // 统一图标解析（与 AppMenu 的 resolveIcon 保持一致的规则）
+  // 支持三种来源：
+  //   1. 远程 URL：http://、https://、//
+  //   2. 绝对路径：/uploads/xxx.png（后端返回的地址）
+  //   3. 本地文件：相对于 baseDir 的本地打包资源
+  // ============================================================
+  const resolveIcon = (ic: string | undefined | null, baseDir: string): string => {
+    if (!ic) return '';
+    // 远程 URL 或绝对路径：直接返回
+    if (/^(https?:)?\/\//.test(ic) || ic.startsWith('/')) return ic;
+    // 本地文件：尝试 require
+    try {
+      return require(baseDir + ic);
+    } catch (e) {
+      // require 失败时返回原字符串，避免整个组件崩掉
+      return ic;
+    }
+  };
+
   export default defineComponent({
     name: 'Medium',
     components: {},
@@ -52,6 +72,7 @@
         hospital: '',
       });
       const mediumpadfef = ref(null as any);
+
       const Resize = computed(() => {
         if (props.size === 'large') {
           return ['width: 4.5rem', 'height: 4.5rem'];
@@ -63,16 +84,21 @@
           return ['width: 2.5rem', 'height: 2.5rem'];
         }
       });
-      const image = computed(() => {
-        return require('@/assets/img/button/' + props.medium.mediumimg);
-      });
-      const captiongif = computed(() => {
-        return require('@/assets/img/gif/' + props.medium.caption);
-      });
+
+      // ★ 图标：支持 远程URL / 绝对路径 / 本地 img/button 目录
+      const image = computed(() =>
+        resolveIcon(props.medium?.mediumimg, '@/assets/img/button/')
+      );
+
+      // ★ 动画：支持 远程URL / 绝对路径 / 本地 img/gif 目录
+      const captiongif = computed(() =>
+        resolveIcon(props.medium?.caption, '@/assets/img/gif/')
+      );
 
       onMounted(() => {
         state.hospital = getStore('machine').hospitalcode;
       });
+
       const onClicked = async function () {
         state.token++;
         state.show = false;

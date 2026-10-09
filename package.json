@@ -1,12 +1,18 @@
 {
   "name": "tfwk.self.app",
   "version": "0.1.0",
+  "appName": "自助机前端",
   "private": true,
   "scripts": {
-    "serve": "set NODE_OPTIONS=--openssl-legacy-provider & vue-cli-service serve",
-    "build": "set NODE_OPTIONS=--openssl-legacy-provider & vue-cli-service build",
-    "build:report": "set NODE_OPTIONS=--openssl-legacy-provider & vue-cli-service build --report"
-  },
+  "gen:health": "node gen-health.js",
+  "serve:only": "set NODE_OPTIONS=--openssl-legacy-provider & vue-cli-service serve",
+  "build:only": "set NODE_OPTIONS=--openssl-legacy-provider & vue-cli-service build",
+  "build:report:only": "set NODE_OPTIONS=--openssl-legacy-provider & vue-cli-service build --report",
+  "serve": "npm run gen:health && npm run serve:only",
+  "build": "npm run gen:health && npm run build:only",
+  "build:report": "npm run gen:health && npm run build:report:only",
+  "commit": "git add . && git commit -m \"初始化项目结构\""
+},
   "dependencies": {
     "@vant/area-data": "^1.3.2",
     "@vant/touch-emulator": "^1.4.0",

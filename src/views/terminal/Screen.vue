@@ -21,7 +21,7 @@
       const state = reactive({
         center: true,
       });
-      let fullScreen = false;
+      let fullScreen = true;
       onBeforeMount(() => {
         state.center = getStore('machine').hospitalcode === 'bjsftqzyyy' ? false : 
           (getStore('machine').hospitalcode === 'dlyy' && getStore('machine').redirect != 'registry.dlyy') ? false : true;
@@ -85,7 +85,7 @@
   position: absolute;
   content: '';
   bottom: 5px;
-  left: 15px;
+  left: 5px;
   width: 50%;
   top: 95%;
   background: #777;
@@ -105,7 +105,7 @@
   -o-transform: rotate(3deg);
   -ms-transform: rotate(3deg);
   transform: rotate(3deg);
-  right: 15px;
+  right: 5px;
   left: auto;
 }
 

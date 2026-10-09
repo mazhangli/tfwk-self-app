@@ -141,6 +141,7 @@
         paymodes: {} as any,
         payend: false,
         paymode: {} as any /**选择的支付方式**/,
+        thirdOrderNo: '' as string,
       });
       const active = ref('');
       onBeforeMount(async () => {
@@ -262,7 +263,19 @@
       };
 
       const onPayask = async function (type: string, authcode?: string) {
+        if(state.thirdOrderNo == props.hisOrder.thirdOrderno){
+          console.log('当前订单号重复，返回', state.thirdOrderNo);
+          return;
+        }
+        console.log('记录信息', type, props.hisOrder.thirdOrderno, props.amount, authcode);
         if (props.hisOrder && props.hisOrder.thirdOrderno && props.amount) {
+          console.log(
+            '传入后端支付信息',
+            type,
+            props.hisOrder.thirdOrderno,
+            props.amount,
+            authcode
+          );
           Open('');
           active.value = type;
           // state.locked = true;
@@ -272,6 +285,7 @@
             //state.qrbarcode = await calldrive(DeviceEnum.PAYAPI, 'RequestOrder', [type, props.hisOrder.thirdOrderno, props.amount.toString(), start, end], 0);
             var payorder = null as any;
             try {
+              state.thirdOrderNo = props.hisOrder.thirdOrderno;
               payorder = await callpayapi(
                 type === 'wechat'
                   ? PayModeEnum.WECHAT
@@ -285,17 +299,26 @@
                   amount: props.amount,
                   start: start,
                   end: end,
+                  payway: type === 'wechat'
+                  ? PayModeEnum.WECHAT
+                  : type === 'alipay'
+                  ? PayModeEnum.ALIPAY
+                  : PayModeEnum.UNIONPAY,
                 }
               );
               state.payOrder = payorder;
-            } catch (error) {}
+            } catch (error) {
+              console.log('支付请求失败', error);
+            }
             if (!payorder) {
               Close();
               active.value = '';
               return;
             }
             console.log(payorder);
-            state.qrbarcode = payorder.infor.qrCode;
+            if (payorder && payorder.infor && payorder.infor.qrCode) {
+              state.qrbarcode = payorder.infor.qrCode;
+            }
             Close();
             //if (state.qrbarcode) {
             state.locked = true;
@@ -385,11 +408,10 @@
                 PayMethodEnum.CloseOrder,
                 {
                   thirdOrderno: props.hisOrder.thirdOrderno,
-                } 
-              );               
+                }
+              );
               state.payend = true;
             } catch (error) {
-
             } finally {
               ctx.emit('onCancel');
             }

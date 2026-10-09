@@ -123,10 +123,10 @@ export const http = function createAxios(apiUrl: string) {
     // } else {
     //   console.error('config 对象格式错误或缺少 apiUrl 属性');
     // }
-    // service.defaults.baseURL = 'http://localhost:8889/Server.asmx'; //本机
+    service.defaults.baseURL = 'http://localhost:8889/Server.asmx'; //本机
     // service.defaults.baseURL = 'http://119.3.222.59:5757/Server.asmx'; //丰台医院
     // service.defaults.baseURL = 'http://10.165.8.89:8889/Server.asmx'; //北坞
-    // service.defaults.baseURL = 'http://10.165.8.89:8886/Server.asmx'; //北坞(集群)
+    // service.defaults.baseURL = 'http://10.165.8.89:8886/Server.asmx'; //北坞(集群)                        ***********administrator/Bwjy@8.89
     // service.defaults.baseURL = 'http://10.165.8.89:8899/Server.asmx'; //北坞(测试)
     // service.defaults.baseURL = 'http://172.16.209.230:2900/Server.asmx'; //马家堡
     // service.defaults.baseURL = 'http://172.16.209.230:1444/Server.asmx'; //马家堡
@@ -145,7 +145,8 @@ export const http = function createAxios(apiUrl: string) {
     // service.defaults.baseURL = 'http://192.168.3.200:8888/Server.asmx'; //东方明中医院
     // service.defaults.baseURL = 'http://192.168.3.225:8080/Server.asmx'; //送变电
     // service.defaults.baseURL = 'http://192.168.0.221:8888/Server.asmx'; //福利医院
-    service.defaults.baseURL = 'http://192.168.101.134:8888/Server.asmx'; //安定门
+    // service.defaults.baseURL = 'http://192.168.101.134:8888/Server.asmx'; //安定门
+    // service.defaults.baseURL = 'http://192.168.0.6:8080/Server.asmx'; //本真堂
     //========================================================localhot //民航医院
     // apiUrl = service.defaults.baseURL;
   }

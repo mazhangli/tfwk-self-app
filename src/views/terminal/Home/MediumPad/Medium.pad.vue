@@ -262,6 +262,9 @@ export default defineComponent({
         case 'lisreport': // 化验报告
           pushRouteWithoutParam(appRouteEnum.LisReport);
           break;
+        case 'lisreport.unprint': // 化验报告(仅查询,隐藏打印按钮)
+          pushRouteWithParam(appRouteEnum.LisReport, { unprint: '1' });
+          break;
         case 'lisreport.new': // 化验报告
           pushRouteWithoutParam(appRouteEnum.LabReport);
           break;

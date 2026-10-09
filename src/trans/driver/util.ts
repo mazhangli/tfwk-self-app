@@ -61,7 +61,7 @@ export function stateres(res: any) {
     });
     return null;
   }
-  if (info.info === null || info.info === [] || info.info.length === 0) {
+  if (info.info === null || info.info.length === 0) {
     Toast.loading({
       forbidClick: true,
       message: '终端设备服务器未应答',

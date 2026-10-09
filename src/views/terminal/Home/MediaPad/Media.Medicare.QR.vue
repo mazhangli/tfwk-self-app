@@ -29,6 +29,24 @@ import NumberKeyboard from '@/components/Keyboard/NumberKeyboard/src/index.vue';
 import { setStore } from '@/utils/cache/storage';
 import { isIdCard } from '@/utils/is';
 import { useEventListener } from '@vant/use';
+
+// ============================================================
+// 图标/动画解析（与 AppMenu、Medium 保持一致）
+// 支持三种来源：
+//   1. 远程 URL：http://、https://、//
+//   2. 绝对路径：/uploads/xxx.gif（后端返回的地址）
+//   3. 本地文件：相对于 baseDir 的本地打包资源
+// ============================================================
+const resolveIcon = (ic: string | undefined | null, baseDir: string): string => {
+  if (!ic) return '';
+  if (/^(https?:)?\/\//.test(ic) || ic.startsWith('/')) return ic;
+  try {
+    return require(baseDir + ic);
+  } catch (e) {
+    return ic;
+  }
+};
+
 export default defineComponent({
   name: 'MediaMedicareBarcode',
   props: {
@@ -51,7 +69,7 @@ export default defineComponent({
     onMounted(() => {
       console.log('onMounted');
       state.keyicon = require('@/assets/svg/keyboard.svg');
-      state.caption = require('@/assets/img/gif/' + props.medium.caption);
+      state.caption = resolveIcon(props.medium.caption, '@/assets/img/gif/');
       console.log(props.medium.caption);
       console.dir(Container.value);
       state.live = true;

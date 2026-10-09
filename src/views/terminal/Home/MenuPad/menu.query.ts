@@ -1,6 +1,7 @@
 import { menu } from '@/trans/server/self/machine';
 import { getStore } from '@/utils/cache/storage';
 import { ref, toRaw } from 'vue';
+import { style } from '@/trans/server/self/machine';
 
 const grid = { col: 4, row: 6, gutter: '5px' };
 const padding = { left: 100, right: 100, top: 20, bottom: 20 };

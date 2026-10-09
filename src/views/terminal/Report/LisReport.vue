@@ -77,7 +77,7 @@
     </div>
     <div class="content__foot flex-r-3">
       <van-button
-        v-if="hospital != 'bjftyy'"
+        v-if="hospital != 'bjftyy' && unprint === false"
         v-preventReClick="2000"
         class="btn-size-normal font-s btn__foot margin"
         type="primary"
@@ -124,6 +124,7 @@
 
 <script lang="ts">
   import { computed, defineComponent, onMounted, reactive, ref, toRefs } from 'vue';
+  import { useRoute } from 'vue-router';
   import PickerRow from '@/components/Picker/Picker.Row.vue';
   import TimerButton from '@/components/terminal/button/TimerButton.vue';
   import { appRouteEnum, pushAppHome, pushRouteWithParam } from '@/router/router';
@@ -152,9 +153,12 @@
         preview: [] as any[],
         hospital: '',
         range: 0,
+        unprint: false,
       });
 
       onMounted(async () => {
+        const route = useRoute();
+        state.unprint = route.query.unprint === '1';
         state.hospital = getStore('machine').hospitalcode;
         state.hasInfo = false;
         state.empty = require('@/assets/svg/report.none.svg');

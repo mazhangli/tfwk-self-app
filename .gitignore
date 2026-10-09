@@ -21,3 +21,5 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+# health.json 构建产物
+public/health.json

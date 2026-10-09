@@ -12,7 +12,7 @@
                             <div class="subfield__item flex direction_column justify_start align-items_start align-content_start"
                                 style="padding-top: 4%;padding-left: 5%;">
                                 <div class="flex direction_column justify_start align-items_start align-content_start">
-                                    <van-image :src="require('@/assets/svg/button/' + subfield.menuicon)" width="1rem"
+                                    <van-image :src="(/^https?:\/\//.test(subfield.menuicon) || (subfield.menuicon||'').startsWith('//')) ? subfield.menuicon : require('@/assets/svg/button/' + subfield.menuicon)" width="1rem"
                                         style="padding-bottom: 0.2rem ; border-bottom: 2px solid #fff" />
                                 </div>
                                 <div class="flex direction_column justify_start align-items_start align-content_start"

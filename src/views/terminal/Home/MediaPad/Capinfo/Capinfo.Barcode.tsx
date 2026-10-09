@@ -3,6 +3,24 @@ import { getStore } from '@/utils/cache/storage';
 import { Close, Open } from '@/utils/loading';
 import { createVNode, defineComponent, onMounted, reactive, ref, render, Transition } from 'vue';
 import { useEventListener } from '@vant/use';
+
+// ============================================================
+// 图标/动画解析（与 AppMenu、Medium 保持一致）
+// 支持三种来源：
+//   1. 远程 URL：http://、https://、//
+//   2. 绝对路径：/uploads/xxx.gif（后端返回的地址）
+//   3. 本地文件：相对于 baseDir 的本地打包资源
+// ============================================================
+const resolveIcon = (ic: string | undefined | null, baseDir: string): string => {
+  if (!ic) return '';
+  if (/^(https?:)?\/\//.test(ic) || ic.startsWith('/')) return ic;
+  try {
+    return require(baseDir + ic);
+  } catch (e) {
+    return ic;
+  }
+};
+
 const createComponent = () => {
   const data = reactive({
     // 控制是否显示
@@ -12,7 +30,7 @@ const createComponent = () => {
   const medium = getStore('medias').find((value: any, index: any) => {
     return value.mediacode === 'MEDICARE.BARCODE';
   });
-  const caption = require('@/assets/img/gif/' + medium.caption);
+  const caption = resolveIcon(medium.caption, '@/assets/img/gif/');
   const div = document.createElement('div');
   const destroySelf = () => {
     document.body.removeChild(vm.el as HTMLElement);

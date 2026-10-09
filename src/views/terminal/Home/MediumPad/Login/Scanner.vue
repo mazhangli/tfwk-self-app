@@ -8,6 +8,7 @@
             <van-number-keyboard :show="true" theme="custom" extra-key="." close-button-text="完成"
                 class="van-number-keyboard" @input="onInput" @close="onClose" @delete="onDelete" />
         </div>
+        <!-- 说明：原来这里有个 van-image 用了 caption，已注释掉。如需重新启用，直接解注释即可 -->
         <!-- <van-image width="90%" height="calc(100% - 1rem)" radius="1em" fit="contain" position="center" :src="caption" /> -->
     </div>
 </template>
@@ -31,6 +32,27 @@
   import { useRoute } from 'vue-router';
   import { usePageVisibility } from '@vant/use';
   import { useEventListener } from '@vant/use';
+
+  // ============================================================
+  // 图标/动画解析（与 AppMenu、Medium 保持一致）
+  // 支持三种来源：
+  //   1. 远程 URL：http://、https://、//
+  //   2. 绝对路径：/uploads/xxx.gif（后端返回的地址）
+  //   3. 本地文件：相对于 baseDir 的本地打包资源
+  // ============================================================
+  const resolveIcon = (ic: string | undefined | null, baseDir: string): string => {
+    if (!ic) return '';
+    // 远程 URL 或绝对路径：直接返回
+    if (/^(http?:)?\/\//.test(ic) || ic.startsWith('/')) return ic;
+    // 本地文件：尝试 require
+    try {
+      return require(baseDir + ic);
+    } catch (e) {
+      // require 失败时返回原字符串，避免整个组件崩掉
+      return ic;
+    }
+  };
+
   export default defineComponent({
     name: 'MediumScanner',
     props: {
@@ -46,8 +68,15 @@
         value: '',
       });
       const Container = ref(null as any);
+
       onMounted(() => {
-        state.caption = require('@/assets/img/gif/' + props.medium.caption);
+        // ★ 关键改动：不再无条件 require，改用 resolveIcon
+        //   - '/uploads/xxx.gif' → 直接返回
+        //   - 'https://xxx.com/a.gif' → 直接返回
+        //   - 'loading.gif' → require('@/assets/img/gif/loading.gif')
+        //   - '' / 未定义 → 返回空串
+        state.caption = resolveIcon(props.medium?.caption, '@/assets/img/gif/');
+
         console.dir(Container.value);
         state.live = true;
       });
@@ -159,4 +188,5 @@
 //   /deep/.van-number-keyboard {
 //     background-color: rgba(235, 238, 245, 0.7);
 //     padding: 1%;
-//   }</style>
+  
+</style>

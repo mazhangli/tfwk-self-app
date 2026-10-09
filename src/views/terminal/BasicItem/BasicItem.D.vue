@@ -167,6 +167,42 @@
               </van-form-item>
             </van-col>
           </van-row>
+          <van-row gutter="16">
+            <van-col span="24">
+              <van-form-item label="服务产出">
+                <van-field
+                  label="服务产出:"
+                  v-model="item.sevice_output"
+                  readonly
+                  placeholder="无服务产出信息"
+                />
+              </van-form-item>
+            </van-col>
+          </van-row>
+          <van-row gutter="16">
+            <van-col span="24">
+              <van-form-item label="价格构成">
+                <van-field
+                  label="价格构成:"
+                  v-model="item.price_composition"
+                  readonly
+                  placeholder="无价格构成信息"
+                />
+              </van-form-item>
+            </van-col>
+          </van-row>
+          <van-row gutter="16">
+            <van-col span="24">
+              <van-form-item label="收费依据">
+                <van-field
+                  label="收费依据:"
+                  v-model="item.charge_basis"
+                  readonly
+                  placeholder="无收费依据信息"
+                />
+              </van-form-item>
+            </van-col>
+          </van-row>
         </van-form>
       </div>
     </div>
@@ -207,6 +243,9 @@
     Origin: string;
     insurancePrompt: string;
     hospitalPrompt: string;
+    sevice_output: string;
+    price_composition: string;
+    charge_basis: string;
   }
 
   export default defineComponent({

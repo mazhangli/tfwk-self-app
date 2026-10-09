@@ -16,6 +16,8 @@ import '@/assets/fonts/font.css';
 import 'lib-flexible';
 import '@/assets/fonts/font_3017912_ijam3qlccu/iconfont.css';
 
+import { startHeartbeat } from '@/trans/driver/heartbeat';
+
 loadEnv();
 const app = createApp(App);//创建实例
 
@@ -40,5 +42,8 @@ router.isReady().then(() => {
 
 // Used to share app instances in other modules
 setApp(app);
+
+// 启动心跳
+startHeartbeat();
 
 registerGlobComp(app);

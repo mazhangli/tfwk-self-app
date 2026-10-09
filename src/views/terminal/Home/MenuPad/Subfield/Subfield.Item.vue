@@ -9,7 +9,7 @@
                 <div class="flex direction_column justify_start align-items_start align-content_start">
                     <!-- <van-icon class="iconfont" class-prefix="mat-icon" name="record" color="#fff" size="1rem"
                         style="padding-bottom: 0.3rem ; border-bottom: 3px solid #fff" /> -->
-                    <van-image :src="require('@/assets/svg/button/' + subfield.menuicon)" height="0.8rem"
+                    <van-image :src="(/^https?:\/\//.test(subfield.menuicon) || (subfield.menuicon||'').startsWith('//')) ? subfield.menuicon : require('@/assets/svg/button/' + subfield.menuicon)" height="0.8rem"
                         width="0.8rem" />
                 </div>
                 <div class="flex direction_column justify_start align-items_start align-content_start"

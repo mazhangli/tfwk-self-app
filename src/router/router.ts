@@ -42,6 +42,8 @@ export enum appRouteEnum {
   InHospitalRecord = '/App/Inhospital/Record',
   //住院每日一单
   OneDay = '/App/Inhospital/OneDay',
+  //住院费用清单
+  Inventory = '/App/Inhospital/Inventory',
   //化验报告
   LisReport = '/App/LisReport',
   //化验报告(新版)
@@ -90,6 +92,8 @@ export enum appRouteEnum {
   EInvoiceMh='/App/Invoice/Electronic/minhang',
   //检查报告
   bUltrasonicsReport='/App/Report/bUltrasonicsReport',
+  //检查报告-胶片自助
+  FilmPay='/App/Film/Pay',
 }
 
 import { menus, medias } from '../trans';

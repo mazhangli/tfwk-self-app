@@ -33,7 +33,7 @@
           <media-medicare-barcode @onCallend="onEnd" v-if="type === 'MEDICARE.BARCODE'" :key="token" :medium="medium" />
           <!-- <media-enter @onCallend="onEnd" v-if="type === 'ENTER'" :key="token" :medium="medium" /> -->
           <media-phone @onCallend="onEnd" v-if="type === 'PHONE'" :key="token" :medium="medium" />
-          <media-scanner @onCallend="onEnd" v-if="type === 'SCANNER'" :key="token" :medium="medium" />
+          <media-scanner @onCallend="onEnd" v-if="type === 'SCANNING'" :key="token" :medium="medium" />
         </div>
       </div>
     </div>

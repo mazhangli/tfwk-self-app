@@ -199,7 +199,7 @@ export async function callcapinfo(method: MethodEnum, args?: any) {
           Notify({
             type: 'warning',
             message: _Obj.root.state.error[0]._info,
-            duration: 500,
+            duration: 1500,
             position: 'bottom',
           });
         // Toast.fail({
@@ -211,7 +211,7 @@ export async function callcapinfo(method: MethodEnum, args?: any) {
           Notify({
             type: 'warning',
             message: _Obj.root.state.error._info,
-            duration: 500,
+            duration: 1500,
             position: 'bottom',
           });
         return undefined;

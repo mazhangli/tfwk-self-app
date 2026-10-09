@@ -10,6 +10,7 @@ export enum PayApiEnum {
   SWIFTPASS = 'swiftpass',
   CHASE = 'chase',
   CHASED = 'chase.dll',
+  ADMPAY = 'admPay',
 }
 export enum PayMethodEnum {
   RequestOrder = 'requestorder',
@@ -25,6 +26,7 @@ import { tfwk$alipay } from './src/alipay';
 import { chinaums } from './src/chinaums';
 import { chase } from './src/chase';
 import { chasedll } from './src/chase.dll';
+import { adm$pay } from './src/admPay';
 import { ApiEnum, callApi, MethodEnum } from '../driver';
 
 export async function callpayapi(mode: PayModeEnum, method: PayMethodEnum, infor: any) {
@@ -59,6 +61,9 @@ export async function callpayapi(mode: PayModeEnum, method: PayMethodEnum, infor
       break;
     case 'chase.dll':
       return await chasedll(method, infor);
+      break;
+      case 'admPay':
+      return await adm$pay(method, infor);
       break;
     default:
       throw new Error('暂不支持的接口');

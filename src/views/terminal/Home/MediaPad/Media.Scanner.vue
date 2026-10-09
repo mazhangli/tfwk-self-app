@@ -26,6 +26,27 @@ import { defineComponent, nextTick, onMounted, reactive, ref, watch, toRefs, onA
 // import NumberKeyboard from '@/components/Keyboard/NumberKeyboard/src/index.vue';
 import { setStore } from '@/utils/cache/storage';
 import { isPhoneNumber } from '@/utils/is';
+
+// ============================================================
+// 图标/动画解析（与 AppMenu、Medium、MediumScanner 保持一致）
+// 支持三种来源：
+//   1. 远程 URL：http://、https://、//
+//   2. 绝对路径：/uploads/xxx.gif（后端返回的地址）
+//   3. 本地文件：相对于 baseDir 的本地打包资源
+// ============================================================
+const resolveIcon = (ic: string | undefined | null, baseDir: string): string => {
+    if (!ic) return '';
+    // 远程 URL 或绝对路径：直接返回
+    if (/^(https?:)?\/\//.test(ic) || ic.startsWith('/')) return ic;
+    // 本地文件：尝试 require
+    try {
+        return require(baseDir + ic);
+    } catch (e) {
+        // require 失败时返回原字符串，避免整个组件崩掉
+        return ic;
+    }
+};
+
 export default defineComponent({
     name: 'MediaScanner',
     props: {
@@ -44,7 +65,12 @@ export default defineComponent({
 
         onMounted(() => {
             console.log('onMounted');
-            state.caption = require('@/assets/img/gif/' + props.medium.caption);
+            // ★ 关键改动：不再无条件 require，改用 resolveIcon
+            //   - '/uploads/xxx.gif' → 直接返回
+            //   - 'https://xxx.com/a.gif' → 直接返回
+            //   - 'loading.gif' → require('@/assets/img/gif/loading.gif')
+            //   - '' / 未定义 → 返回空串
+            state.caption = resolveIcon(props.medium?.caption, '@/assets/img/gif/');
             console.log(state.caption);
             state.live = true;
         });

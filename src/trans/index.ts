@@ -1,5 +1,5 @@
 import { menu, menuSuspend, machine, media } from '@/trans/server/self/machine';
-import { setStore } from '@/utils/cache/storage';
+import { getStore, setStore } from '@/utils/cache/storage';
 import {
   payment$budget,
   payment$cancel,
@@ -56,8 +56,9 @@ export async function menuSuspends(menucode: string) {
   
 }
 export async function medias() {
+  const menuCode = getStore('last')?.menuCode || '';
   // 取本机所需功能表
-  const res = await media();
+  const res = await media(menuCode);
   if (res) {
     setStore('medias', res);
     return res;

@@ -15,6 +15,7 @@ import Payment from '@/views/terminal/Payment/Payment.vue';
 import Deposit from '@/views/terminal/Inpatient/Deposit.vue';
 import InHospitalRecord from '@/views/terminal/Inpatient/Record.vue';
 import OneDay from '@/views/terminal/Inpatient/OneDay.vue';
+import Inventory from '@/views/terminal/Inpatient/Inventory.vue';
 import LisReport from '@/views/terminal/Report/LisReport.vue';
 import LabReport from '@/views/terminal/Report/LisReport.New.vue';
 import BasicItem from '@/views/terminal/BasicItem/BasicItem.vue';
@@ -44,6 +45,7 @@ import RegistryDlyy from '@/views/terminal/Registry/Registry.D.vue';
 import EInvoice from '@/views/terminal/Invoice/Invoice.Electronic.vue';
 import EInvoiceMh from '@/views/terminal/Print/Medical.Invoice.Print.vue';
 import bUltrasonicsReport from '@/views/terminal/Report/bUltrasonicsReport.vue';
+import FilmPay from '@/views/terminal/FilmPay/Index.vue';
 // import App from '@/App.vue';
 import { appRouteEnum } from './router';
 import { setStore } from '@/utils/cache/storage';
@@ -180,6 +182,12 @@ const routes: RouteRecordRaw[] = [
         component: OneDay,
       },
       {
+        //住院费用清单
+        path: appRouteEnum.Inventory,
+        name: appRouteEnum.Inventory.replace('/', ''),
+        component: Inventory,
+      },
+      {
         //化验报告
         path: appRouteEnum.LisReport,
         name: appRouteEnum.LisReport.replace('/', ''),
@@ -311,6 +319,12 @@ const routes: RouteRecordRaw[] = [
         name: appRouteEnum.bUltrasonicsReport.replace('/', ''),
         component: bUltrasonicsReport,
       },
+      {
+        //检查报告-胶片自助
+        path: appRouteEnum.FilmPay,
+        name: appRouteEnum.FilmPay.replace('/', ''),
+        component: FilmPay,
+      }
     ],
   },
 ];

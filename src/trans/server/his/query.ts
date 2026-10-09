@@ -30,7 +30,11 @@ export async function queryBasicitem(
   }
 }
 
-export async function queryRegist(hisOrderno?: number) {
+export async function queryRegist(
+  hisOrderno?: number,
+  startTime?: string,
+  endTime?: string
+) {
   const systime = formatToDateTime(new Date().getTime());
   var empid = getStore('system').empId;
   var patientId = getStore('history').patientid;
@@ -41,6 +45,8 @@ export async function queryRegist(hisOrderno?: number) {
     info: {
       patientId: patientId,
       hisOrderno: hisOrderno || 0,
+      startTime: startTime || '',
+      endTime: endTime || '',
     },
   };
   var info = await callServer(json);
@@ -51,7 +57,11 @@ export async function queryRegist(hisOrderno?: number) {
   }
 }
 
-export async function queryPayment(hisOrderno?: number) {
+export async function queryPayment(
+  hisOrderno?: number,
+  startTime?: string,
+  endTime?: string
+) {
     const systime = formatToDateTime(new Date().getTime());
     var empid = getStore('system').empId;
     var patientId = getStore('history').patientid;
@@ -62,6 +72,8 @@ export async function queryPayment(hisOrderno?: number) {
       info: {
         patientId: patientId,
         hisOrderno: hisOrderno || 0,
+        startTime: startTime || '',
+        endTime: endTime || '',
       },
     };
     var info = await callServer(json);
@@ -71,7 +83,11 @@ export async function queryPayment(hisOrderno?: number) {
       return null;
     }
   }
-  export async function queryAppointment(hisOrderno?: number) {
+  export async function queryAppointment(
+    hisOrderno?: number,
+    startTime?: string,
+    endTime?: string
+  ) {
     const systime = formatToDateTime(new Date().getTime());
     var empid = getStore('system').empId;
     var patientId = getStore('history').patientid;
@@ -82,6 +98,8 @@ export async function queryPayment(hisOrderno?: number) {
       info: {
         patientId: patientId,
         hisOrderno: hisOrderno || 0,
+        startTime: startTime || '',
+        endTime: endTime || '',
       },
     };
     var info = await callServer(json);

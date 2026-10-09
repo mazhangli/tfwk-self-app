@@ -35,13 +35,18 @@
         date: '',
         time: '',
         hosp: '',
-        icon: null,
+        icon: null as any,
       });
       onMounted(() => {
         start();
         const machine = getStore('machine');
         state.hosp = machine.hospitalname;
-        state.icon = require('@/assets/logo/' + machine.hospitalcode + '.svg');
+        const logo = machine.hospitallogo;
+        state.icon = logo
+          ? (/^https?:\/\//.test(logo) || logo.startsWith('//')
+              ? logo
+              : require('@/assets/logo/' + logo))
+          : require('@/assets/logo/' + machine.hospitalcode + '.svg');
       });
       onUnmounted(() => {
         stop();
